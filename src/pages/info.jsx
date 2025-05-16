@@ -9,6 +9,7 @@ import {
 import pack from "@/assets/images/pack.png";
 import lines from "@/assets/images/lines.png";
 import vector from "@/assets/images/vector.png";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const text = [
   "NEW Contemporary \n Pack Design",
@@ -19,18 +20,18 @@ const text = [
   "SAME \n Recessed Filter",
 ];
 
-const Info = ({step, setStep }) => {
+const Info = ({ step, setStep }) => {
   const [api, setApi] = useState(false);
   React.useEffect(() => {
     if (!api) {
-      return
+      return;
     }
 
     api.on("select", () => {
       const currentSlide = api.selectedScrollSnap();
       setStep(currentSlide + 1);
-    })
-  }, [api, setStep])
+    });
+  }, [api, setStep]);
   return (
     <div
       style={{
@@ -61,22 +62,25 @@ const Info = ({step, setStep }) => {
             </div>
           </CarouselItem>
           <CarouselItem>
-            <div className="w-fit mx-auto h-full relative flex flex-col items-center justify-center gap-4">
-              {text.map((item, index) => (
-                <div
-                  key={index}
-                  className="text-2xl text-[#05164E] whitespace-pre-line text-center rounded-2xl p-5 min-w-full"
-                  style={{
-                    backgroundImage: `linear-gradient(135deg, #C4C4C4 0%, #FFFFFF 50%, #C4C4C4 100%)`,
-                    backgroundSize: "100% 100%",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
+            <ScrollArea style={{ height: "calc(100vh - 11rem)" }}>
+              {" "}
+              <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-4 overflow-scroll mt-4">
+                {text.map((item, index) => (
+                  <div
+                    key={index}
+                    className="text-2xl text-[#05164E] whitespace-pre-line text-center rounded-2xl p-5 min-w-full"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, #C4C4C4 0%, #FFFFFF 50%, #C4C4C4 100%)`,
+                      backgroundSize: "100% 100%",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                    }}
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </CarouselItem>
         </CarouselContent>
       </Carousel>
