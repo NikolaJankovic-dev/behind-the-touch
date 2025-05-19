@@ -7,8 +7,12 @@ import info from "@/assets/images/info.png";
 import { Button } from "@/components/ui/button";
 import GoodJob from "./pages/goodjob";
 import Paper from "./pages/paper";
+import forward from "@/assets/images/icons/forward.png";
+import restart from "@/assets/images/icons/restart.png";
 function App() {
   const [step, setStep] = useState(0);
+  const [hideContainer, setHideContainer] = useState(false);
+  const [hasDrawn, setHasDrawn] = useState(false);
 
   return (
     <div
@@ -62,7 +66,7 @@ function App() {
               <GoodJob step={step} />
             </motion.div>
           )}
-          {step === 5 && (
+          {(step === 5 || step === 6 || step === 7) && (
             <motion.div
               key="paper-container"
               initial={{ opacity: 0 }}
@@ -71,12 +75,16 @@ function App() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
-              <Paper step={step} />
+              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
             </motion.div>
           )}
         </AnimatePresence>
-        <div
-          className="absolute bottom-0 left-2 right-2 p-4 bg-[#151515] rounded-t-3xl  h-40"
+        <motion.div
+          // initial={{  }}
+          animate={{ y: hideContainer ? "100%" : "0%" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="absolute bottom-0 left-2 right-2 p-4 bg-[#151515] rounded-t-3xl  h-40 overflow-hidden"
           style={{
             boxShadow: "0px -14px 96px 0px #1580AF",
           }}
@@ -85,14 +93,15 @@ function App() {
             <AnimatePresence mode="wait">
               {step === 0 && (
                 <motion.button
+                  key="start-now"
                   onClick={() => setStep(1)}
                   initial={{ x: 0, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-xl font-semibold cursor-pointer"
+                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start now
+                  Start Now <img src={forward} alt="forward" className="w-8 h-8" />
                 </motion.button>
               )}
 
@@ -106,7 +115,7 @@ function App() {
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                   className="flex flex-col justify-center items-center gap-2"
                 >
-                  <div className="text-white text-xl font-semibold flex items-center gap-2">
+                  <div className="text-white text-xl  flex items-center gap-2">
                     <motion.span
                       className="w-4 h-4 rounded-full  block border border-white"
                       initial={{ backgroundColor: "#ffffffff" }}
@@ -136,7 +145,7 @@ function App() {
                           setStep(3);
                         } 
                       }}
-                      className={`text-white text-xl font-semibold cursor-pointer hover:no-underline ${step === 2 ? "hover:cursor-pointer" : "hover:cursor-default"}`}
+                      className={`text-white text-xl  cursor-pointer hover:no-underline ${step === 2 ? "hover:cursor-pointer" : "hover:cursor-default"}`}
                       variant="link"
                     >
                       Next
@@ -146,31 +155,58 @@ function App() {
               )}
               {step === 3 && (
                 <motion.button
+                  key="next-button"
                   onClick={() => setStep(4)}
                   initial={{ x: 500, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-xl font-semibold cursor-pointer"
+                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
                 >
-                  Next
+                  Next <img src={forward} alt="forward" className="w-8 h-8" />
                 </motion.button>
               )}
               {step === 4 && (
                 <motion.button
+                  key="start-now-button"
                   onClick={() => setStep(5)}
                   initial={{ x: 500, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-xl font-semibold cursor-pointer"
+                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start now
+                  Start now <img src={forward} alt="forward" className="w-8 h-8" />
                 </motion.button>
               )}
+                {(step === 5 || step === 6) && (
+                  <motion.button
+                    key="finish-button"
+                    initial={{ x: 500, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -500, opacity: 0 }}
+                    onClick={() => setStep((prev) => prev + 1)}
+                    className={`text-white text-4xl   flex items-center gap-4 ${!hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"}`}
+                    disabled={!hasDrawn}
+                  >
+                    Finish <img src={forward} alt="forward" className="w-8 h-8" />
+                  </motion.button>
+                )}
+                {step === 7 && (
+                  <motion.button
+                    key="restart-button"
+                    initial={{ x: 500, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -500, opacity: 0 }}
+                    onClick={() => {setStep(0); setHasDrawn(false);}}
+                    className="text-white text-4xl  cursor-pointer flex items-center gap-4"
+                  >
+                    Restart <img src={restart} alt="restart" className="w-8 h-8" />
+                  </motion.button>
+                )}
             </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

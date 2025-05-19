@@ -64,7 +64,7 @@ const Info = ({ step, setStep }) => {
           <CarouselItem>
             <ScrollArea style={{ height: "calc(100vh - 11rem)" }}>
               {" "}
-              <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-4 overflow-scroll mt-4">
+              <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-4 overflow-auto mt-4">
                 {text.map((item, index) => (
                   <div
                     key={index}

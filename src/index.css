@@ -3,6 +3,47 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+@import "tailwindcss";
+
+@font-face {
+    font-family: "PerfectMoment";
+    src: url("/fonts/PerfectMoment-Script.ttf");
+}
+
+@font-face {
+    font-family: "HackneyVector";
+    src: url("/fonts/Hackney-Vector.ttf");
+}
+
+@font-face {
+    font-family: "HackneySVG";
+    src: url("/fonts/Hackney-SVG.otf");
+}
+
+@font-face {
+    font-family: "NeulandGrotesk";
+    src: url("/fonts/NeulandGrotesk-Light.otf");
+}
+
+
+
+body {
+    font-family: "NeulandGrotesk", sans-serif;
+}
+
+.perfect-moment {
+    font-family: "PerfectMoment", sans-serif;
+}
+
+.hackney-svg {
+    font-family: "HackneySVG", sans-serif;
+}
+
+.hackney-vector {
+    font-family: "HackneyVector", sans-serif;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
