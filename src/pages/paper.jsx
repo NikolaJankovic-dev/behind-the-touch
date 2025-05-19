@@ -19,6 +19,9 @@ const Paper = ({
   const stepRef = useRef(step);
   const initialCanvasSnapshot = useRef(null);
   const messageImageRef = useRef(null);
+  let snapshot = null;
+  let offscreenCanvas = null;
+  let offscreenCtx = null;
 
   useEffect(() => {
     stepRef.current = step;
@@ -51,16 +54,44 @@ const Paper = ({
     canvas.height = displayHeight * dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
+    
   
     const img = new Image();
     img.src = "/canvasbg.png";
     img.onload = () => {
       ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+      // Inicijalizuj offscreen canvas
+      offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width = canvas.width;
+      offscreenCanvas.height = canvas.height;
+      offscreenCtx = offscreenCanvas.getContext('2d');
+      offscreenCtx.drawImage(img, 0, 0, displayWidth, displayHeight);
   
-      ctx.fillStyle = "#001790";
-      ctx.globalAlpha = 0.02;
-      ctx.globalCompositeOperation = "multiply";
-  
+      const getPixelColor = (x, y) => {
+        if (!offscreenCtx) return { r: 0, g: 0, b: 0, a: 255 };
+        const pixel = offscreenCtx.getImageData(x, y, 1, 1).data;
+        return {
+          r: pixel[0],
+          g: pixel[1],
+          b: pixel[2],
+          a: pixel[3]
+        };
+      };
+
+      const darkenColor = (color) => {
+        // Ako je boja već dosta tamna (manje od 50), ne potamnjuj je više
+        if (color.r < 50 && color.g < 50 && color.b < 50) {
+          return color;
+        }
+        
+        return {
+          r: Math.max(0, Math.floor(color.r * 0.8)),
+          g: Math.max(0, Math.floor(color.g * 0.8)),
+          b: Math.max(0, Math.floor(color.b * 0.8)),
+          a: color.a
+        };
+      };
+
       initialCanvasSnapshot.current = ctx.getImageData(
         0,
         0,
@@ -70,17 +101,31 @@ const Paper = ({
   
       const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
         return {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
+          x: clientX - rect.left,
+          y: clientY - rect.top,
         };
       };
   
       const startDrawing = (e) => {
+        if (e.touches) e.preventDefault();
         if (stepRef.current !== 5) return;
         const { x, y } = getPos(e);
         isDrawing.current = true;
         lastPoint.current = { x, y };
+        
+        const color = getPixelColor(x, y);
+        const darkenedColor = darkenColor(color);
+        ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.8)`;
+        
         ctx.beginPath();
         ctx.moveTo(x, y);
         setHideContainer(true);
@@ -88,15 +133,45 @@ const Paper = ({
       };
   
       const draw = (e) => {
+        if (e.touches) e.preventDefault();
         if (!isDrawing.current || stepRef.current !== 5) return;
-  
         const { x, y } = getPos(e);
-        ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2);
-        ctx.fill();
+        window.requestAnimationFrame(() => {
+          // Interpolacija između prethodne i nove tačke
+          const dx = x - lastPoint.current.x;
+          const dy = y - lastPoint.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const steps = Math.ceil(distance / 1);
+          for (let i = 0; i < steps; i++) {
+            const t = i / steps;
+            const ix = lastPoint.current.x + dx * t;
+            const iy = lastPoint.current.y + dy * t;
+            const color = getPixelColor(ix, iy);
+            // Tamni više r/g, manje b, i malo pojačaj plavu
+            const darkenedColor = {
+              r: Math.max(0, Math.floor(color.r * 0.92)),
+              g: Math.max(0, Math.floor(color.g * 0.92)),
+              b: Math.min(255, Math.floor(color.b * 0.97) + 4),
+              a: color.a
+            };
+            ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.09)`;
+            ctx.beginPath();
+            ctx.arc(ix, iy, 36, 0, Math.PI * 2);
+            ctx.fill();
+            // Crtaj i na offscreen canvas
+            offscreenCtx.fillStyle = ctx.fillStyle;
+            offscreenCtx.beginPath();
+            offscreenCtx.arc(ix, iy, 36, 0, Math.PI * 2);
+            offscreenCtx.fill();
+          }
+          // update snapshot posle svakog poteza
+          snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          lastPoint.current = { x, y };
+        });
       };
   
-      const stopDrawing = () => {
+      const stopDrawing = (e) => {
+        if (e && e.touches) e.preventDefault();
         if (isDrawing.current && stepRef.current === 5) {
           ctx.closePath();
   
@@ -117,6 +192,10 @@ const Paper = ({
       canvas.addEventListener("pointerup", stopDrawing);
       canvas.addEventListener("pointerleave", stopDrawing);
       canvas.addEventListener("pointercancel", stopDrawing);
+      canvas.addEventListener("touchstart", startDrawing, { passive: false });
+      canvas.addEventListener("touchmove", draw, { passive: false });
+      canvas.addEventListener("touchend", stopDrawing, { passive: false });
+      canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
   
       return () => {
         canvas.removeEventListener("pointerdown", startDrawing);
@@ -124,6 +203,10 @@ const Paper = ({
         canvas.removeEventListener("pointerup", stopDrawing);
         canvas.removeEventListener("pointerleave", stopDrawing);
         canvas.removeEventListener("pointercancel", stopDrawing);
+        canvas.removeEventListener("touchstart", startDrawing, { passive: false });
+        canvas.removeEventListener("touchmove", draw, { passive: false });
+        canvas.removeEventListener("touchend", stopDrawing, { passive: false });
+        canvas.removeEventListener("touchcancel", stopDrawing, { passive: false });
       };
     };
   }, []);
