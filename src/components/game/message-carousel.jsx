@@ -27,15 +27,15 @@ export function MessageCarousel({ activeSlide, setActiveSlide }) {
         align: "center",
       }}
       setApi={setApi}
-      className="w-full absolute bottom-[160px] left-0 right-0 z-10"
+      className="w-full absolute bottom-40 left-0 right-0 z-10"
     >
       <CarouselContent>
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem key={index} className="basis-1/3 lg:basis-1/3 ">
             <div
-              className={` text-white flex flex-col justify-end items-center transition-all h-full duration-300 select-none ${
+              className={` text-white flex flex-col justify-end items-center transition-all h-full duration-300 select-none whitespace-nowrap ${
                 activeSlide + 1 === index
-                  ? "border-b-2 border-white text-3xl opacity-100 p-2"
+                  ? "border-b-2 border-white text-2xl opacity-100 p-2"
                   : "text-md opacity-50 p-4"
               }`}
             >

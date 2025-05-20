@@ -7,6 +7,7 @@ import info from "@/assets/images/info.png";
 import { Button } from "@/components/ui/button";
 import GoodJob from "./pages/goodjob";
 import Paper from "./pages/paper";
+import PaperGSLS from "./pages/papergsls";
 import forward from "@/assets/images/icons/forward.png";
 import restart from "@/assets/images/icons/restart.png";
 function App() {
@@ -16,11 +17,11 @@ function App() {
 
   return (
     <div
-      className="  flex items-center justify-center bg-gray-700 overflow-hidden"
+      className="  flex items-center justify-center bg-gray-700 overflow-hidden relative"
       style={{ height: window.innerHeight }}
     >
       <div
-        className=" sm:rounded-lg rounded-none shadow-lg  sm:aspect-[9/16] aspect-auto w-full sm:w-auto relative overflow-hidden"
+        className=" sm:rounded-lg rounded-none shadow-lg  sm:aspect-[9/16] aspect-auto w-full sm:w-auto  overflow-hidden relative"
         style={{
           height: window.innerHeight,
           backgroundImage: `url(${info})`,
@@ -75,7 +76,8 @@ function App() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
-              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
+              <PaperGSLS step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
+              {/* <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} /> */}
             </motion.div>
           )}
         </AnimatePresence>

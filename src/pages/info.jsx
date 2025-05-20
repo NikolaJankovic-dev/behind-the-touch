@@ -41,7 +41,7 @@ const Info = ({ step, setStep }) => {
         backgroundRepeat: "no-repeat",
         position: "relative",
         width: "100%",
-        height: "100%",
+        height: window.innerHeight,
       }}
     >
       <img
@@ -62,7 +62,7 @@ const Info = ({ step, setStep }) => {
             </div>
           </CarouselItem>
           <CarouselItem>
-            <ScrollArea style={{ height: "calc(100vh - 11rem)" }}>
+            <ScrollArea style={{ height: window.innerHeight - 170 }}>
               {" "}
               <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-4 overflow-auto mt-4">
                 {text.map((item, index) => (
