@@ -284,7 +284,7 @@ const Paper = ({
         animate={{ y: hideContainer ? "-100%" : "0%" }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
-        className="absolute top-0 left-0 right-0 p-4  rounded-b-3xl  h-40 flex justify-start items-end"
+        className="absolute top-0 left-0 right-0 p-4  rounded-b-3xl  h-30 flex justify-start items-end"
         style={{
           background: "radial-gradient(circle, #b4b4b410, #b4b4b430)",
           backdropFilter: "blur(20px)",

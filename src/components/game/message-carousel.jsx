@@ -27,7 +27,7 @@ export function MessageCarousel({ activeSlide, setActiveSlide }) {
         align: "center",
       }}
       setApi={setApi}
-      className="w-full absolute bottom-40 left-0 right-0 z-10"
+      className="w-full absolute bottom-30 left-0 right-0 z-10"
     >
       <CarouselContent>
         {Array.from({ length: 5 }).map((_, index) => (

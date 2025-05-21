@@ -2,7 +2,7 @@ import React from "react";
 import landing from "@/assets/images/landing.png";
 
 const text1 = 'Swipe the screen to unveil the Touch features, then spread the message to your adult smokers!'
-const text2 = 'Use your touch to create a custom design, apply a tagline and download it as a unique background!'
+const text2 = 'Use your touch to create a custom \n design, apply a tagline and download \n it as a unique background!'
 
 const Landing = ({ step }) => {
   return (
@@ -15,7 +15,7 @@ const Landing = ({ step }) => {
         height: window.innerHeight,
       }}
     >
-      <div className="absolute bottom-[180px] left-0 right-0 p-4  flex flex-col justify-center items-center">
+      <div className="absolute bottom-34 left-0 right-0 p-4  flex flex-col justify-center items-center">
         <div className="flex justify-center items-center gap-10 -mb-5">
           <p
             className={`text-white text-2xl ${
@@ -52,7 +52,7 @@ const Landing = ({ step }) => {
         >
           THE TOUCH
         </p>
-        <p className="text-white text-xl text-center w-2/3">
+        <p className="text-white text-xl text-center w-full whitespace-pre-line">
          {step === 0 ? text1 : text2}
         </p>
       </div>

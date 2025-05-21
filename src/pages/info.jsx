@@ -3,13 +3,12 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import pack from "@/assets/images/pack.png";
 import lines from "@/assets/images/lines.png";
 import vector from "@/assets/images/vector.png";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import Card from "../info/card";
+import cigarete from "@/assets/images/cigarete.png";
 
 const text = [
   "NEW Contemporary \n Pack Design",
@@ -20,18 +19,31 @@ const text = [
   "SAME \n Recessed Filter",
 ];
 
-const Info = ({ step, setStep }) => {
-  const [api, setApi] = useState(false);
-  React.useEffect(() => {
-    if (!api) {
-      return;
-    }
+const Info = ({ step, setStep, setShowNext }) => {
+  const [api, setApi] = useState(null);
+  const [disableSwipe, setDisableSwipe] = useState(false);
+  const lastIndex = React.useRef(0);
 
-    api.on("select", () => {
-      const currentSlide = api.selectedScrollSnap();
-      setStep(currentSlide + 1);
-    });
+  React.useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      const current = api.selectedScrollSnap();
+      setStep(current + 1);
+      lastIndex.current = current;
+
+      // Kada smo na drugom slajdu, blokiramo swipe
+      setDisableSwipe(current === 1);
+    };
+
+    api.on("select", onSelect);
+    onSelect();
+
+    return () => {
+      api.off("select", onSelect);
+    };
   }, [api, setStep]);
+
   return (
     <div
       style={{
@@ -49,38 +61,53 @@ const Info = ({ step, setStep }) => {
         alt="vector"
         className="absolute top-0 left-0 w-full mt-10 object-contain"
       />
-
-      <Carousel setApi={setApi}>
-        <CarouselContent>
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: "start",
+          loop: false,
+          skipSnaps: false,
+          dragFree: false,
+        }}
+        className={`${disableSwipe ? "pointer-events-none" : ""} `}
+        style={{
+          height: window.innerHeight,
+        }}
+      >
+        <CarouselContent className="h-full">
           <CarouselItem>
             <div className="w-full">
               <img
                 src={pack}
                 alt="pack"
-                className="w-[90%] ml-auto mt-32 h-full object-contain"
+                className="h-[76vh] absolute bottom-28 right-0 object-contain"
               />
             </div>
           </CarouselItem>
           <CarouselItem>
-            <ScrollArea style={{ height: window.innerHeight - 170 }}>
+            <div className="relative " style={{
+              height: window.innerHeight,
+            }}>
               {" "}
-              <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-4 overflow-auto mt-4">
+              <img
+                src={cigarete}
+                alt="cigarete"
+                className=" object-contain absolute bottom-30 left-0 max-h-[70vh]"
+              />
+              <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-2  mt-4" style={{
+                height: window.innerHeight - 160,
+              }}>
                 {text.map((item, index) => (
-                  <div
+                  <Card
                     key={index}
-                    className="text-2xl text-[#05164E] whitespace-pre-line text-center rounded-2xl p-5 min-w-full"
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, #C4C4C4 0%, #FFFFFF 50%, #C4C4C4 100%)`,
-                      backgroundSize: "100% 100%",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    {item}
-                  </div>
+                    item={item}
+                    index={index}
+                    step={step}
+                    setShowNext={setShowNext}
+                  />
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </CarouselItem>
         </CarouselContent>
       </Carousel>

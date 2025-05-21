@@ -323,7 +323,7 @@ const Paper = ({
   }, [step]);
 
   return (
-    <div style={{ position: "relative", height: "100vh" }}>
+    <div style={{ position: "relative", height: window.innerHeight }}>
       <canvas
         ref={canvasRef}
         id="canvas"
@@ -345,7 +345,7 @@ const Paper = ({
         animate={{ y: hideContainer ? "-100%" : "0%" }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
-        className="absolute top-0 left-0 right-0 p-4  rounded-b-3xl  h-40 flex justify-start items-end"
+        className="absolute top-0 left-0 right-0 p-4  rounded-b-3xl  h-30 flex justify-start items-end"
         style={{
           background: "radial-gradient(circle, #b4b4b410, #b4b4b430)",
           backdropFilter: "blur(20px)",
@@ -353,7 +353,7 @@ const Paper = ({
         }}
       >
         {" "}
-        {step < 7 && (
+        {step < 8 && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -366,7 +366,7 @@ const Paper = ({
             Back
           </motion.button>
         )}
-        {step === 7 && (
+        {/* {step === 7 && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -377,7 +377,7 @@ const Paper = ({
             <img src={zoom} alt="zoom" className="w-8 h-8" />
             Zoom-in
           </motion.button>
-        )}
+        )} */}
       </motion.div>
       {step === 7 && (
         <motion.div
@@ -385,7 +385,7 @@ const Paper = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute bottom-[170px] left-2 right-2 p-4 gap-4 rounded-3xl text-white  flex flex-col justify-center items-center cursor-pointer"
+          className="absolute bottom-32  left-2 right-2 p-4 gap-4 rounded-3xl text-white  flex flex-col justify-center items-center cursor-pointer"
           style={{
             background:
               "radial-gradient(circle at center, #0A578C 0%, #0E2843 100%)",

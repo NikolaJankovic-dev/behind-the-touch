@@ -14,7 +14,7 @@ function App() {
   const [step, setStep] = useState(0);
   const [hideContainer, setHideContainer] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
-
+  const [showNext, setShowNext] = useState(false);
   return (
     <div
       className="  flex items-center justify-center bg-gray-700 overflow-hidden relative"
@@ -52,7 +52,7 @@ function App() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
-              <Info step={step} setStep={setStep} />
+              <Info step={step} setStep={setStep} setShowNext={setShowNext} />
             </motion.div>
           )}
           {step === 3 && (
@@ -76,8 +76,8 @@ function App() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
-              <PaperGSLS step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
-              {/* <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} /> */}
+              {/* <PaperGSLS step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} /> */}
+              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -86,7 +86,7 @@ function App() {
           animate={{ y: hideContainer ? "100%" : "0%" }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute bottom-0 left-2 right-2 p-4 bg-[#151515] rounded-t-3xl  h-40 overflow-hidden"
+          className="absolute bottom-0 left-2 right-2 p-4 bg-[#151515] rounded-t-3xl  h-30 overflow-hidden"
           style={{
             boxShadow: "0px -14px 96px 0px #1580AF",
           }}
@@ -137,7 +137,7 @@ function App() {
                   </div>
                   <motion.div
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: step === 2 ? 1 : 0 }}
+                    animate={{ opacity: showNext ? 1 : 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5, ease: "easeInOut" }}
                   >
