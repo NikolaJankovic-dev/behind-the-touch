@@ -80,7 +80,7 @@ const Info = ({ step, setStep, setShowNext }) => {
               <img
                 src={pack}
                 alt="pack"
-                className="h-[76vh] absolute bottom-28 right-0 object-contain"
+                className="h-[68vh] absolute bottom-28 right-0 object-contain"
               />
             </div>
           </CarouselItem>
@@ -92,7 +92,7 @@ const Info = ({ step, setStep, setShowNext }) => {
               <img
                 src={cigarete}
                 alt="cigarete"
-                className=" object-contain absolute bottom-30 left-0 max-h-[70vh]"
+                className=" object-contain absolute bottom-30 left-0 max-h-[62vh]"
               />
               <div className="w-fit mx-auto  relative flex flex-col items-center justify-center gap-2  mt-4" style={{
                 height: window.innerHeight - 160,

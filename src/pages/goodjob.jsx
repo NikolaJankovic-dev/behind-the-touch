@@ -1,6 +1,6 @@
 import React from "react";
 import goodjob from "@/assets/images/goodjob3.png";
-import gjpack from "@/assets/images/gjpack3.png";
+import gjpack from "@/assets/images/pack-mobile.png";
 
 const GoodJob = ({ step }) => {
   return (
@@ -16,9 +16,9 @@ const GoodJob = ({ step }) => {
       <img
         src={gjpack}
         alt="gjpack"
-        className="absolute top-10 left-[50%] translate-x-[-60%] h-[50vh] w-auto object-cover object-center"
+        className="absolute top-20 left-[50%] translate-x-[-50%] h-[40vh] w-auto object-cover object-center"
       />
-      <div className="absolute bottom-34 left-0 right-0 p-4 gap-4 flex flex-col justify-center items-center">
+      <div className="absolute bottom-32 left-0 right-0 p-4 gap-2 flex flex-col justify-center items-center">
         <p
           className=" text-8xl hackney-vector text-center"
           style={{

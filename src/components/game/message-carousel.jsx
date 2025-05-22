@@ -35,8 +35,8 @@ export function MessageCarousel({ activeSlide, setActiveSlide }) {
             <div
               className={` text-white flex flex-col justify-end items-center transition-all h-full duration-300 select-none whitespace-nowrap ${
                 activeSlide + 1 === index
-                  ? "border-b-2 border-white text-2xl opacity-100 p-2"
-                  : "text-md opacity-50 p-4"
+                  ? "border-b-2 border-white text-xl opacity-100 p-2"
+                  : "text-sm opacity-50 p-4"
               }`}
             >
               {activeSlide + 1 === index && (

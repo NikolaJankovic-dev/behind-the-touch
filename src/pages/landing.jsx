@@ -1,7 +1,7 @@
 import React from "react";
 import landing from "@/assets/images/landing.png";
 
-const text1 = 'Swipe the screen to unveil the Touch features, then spread the message to your adult smokers!'
+const text1 = 'Swipe the screen to unveil the Touch \n features, then spread the message \n to your adult smokers!'
 const text2 = 'Use your touch to create a custom \n design, apply a tagline and download \n it as a unique background!'
 
 const Landing = ({ step }) => {

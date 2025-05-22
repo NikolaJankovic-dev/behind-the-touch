@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MessageCarousel } from "../components/game/message-carousel";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import back from "@/assets/images/icons/back.png";
 import zoom from "@/assets/images/icons/zoom.png";
 import download from "@/assets/images/icons/download.png";
+import hand from "@/assets/images/hand.png";
+import ellipse from "@/assets/images/ellipse.png";
 
 const Paper = ({
   setHideContainer,
@@ -11,6 +13,7 @@ const Paper = ({
   setStep,
   setHasDrawn,
   hideContainer,
+  hasDrawn,
 }) => {
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
@@ -42,31 +45,30 @@ const Paper = ({
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!canvas || !ctx) return;
-  
+
     const container = canvas.parentElement;
     const displayWidth = container.clientWidth;
     const displayHeight = container.clientHeight;
     const dpr = window.devicePixelRatio || 1;
-  
+
     canvas.style.width = `${displayWidth}px`;
     canvas.style.height = `${displayHeight}px`;
     canvas.width = displayWidth * dpr;
     canvas.height = displayHeight * dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
-    
-  
+
     const img = new Image();
     img.src = "/canvasbg.png";
     img.onload = () => {
       ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
       // Inicijalizuj offscreen canvas
-      offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas = document.createElement("canvas");
       offscreenCanvas.width = canvas.width;
       offscreenCanvas.height = canvas.height;
-      offscreenCtx = offscreenCanvas.getContext('2d');
+      offscreenCtx = offscreenCanvas.getContext("2d");
       offscreenCtx.drawImage(img, 0, 0, displayWidth, displayHeight);
-  
+
       const getPixelColor = (x, y) => {
         if (!offscreenCtx) return { r: 0, g: 0, b: 0, a: 255 };
         const pixel = offscreenCtx.getImageData(x, y, 1, 1).data;
@@ -74,7 +76,7 @@ const Paper = ({
           r: pixel[0],
           g: pixel[1],
           b: pixel[2],
-          a: pixel[3]
+          a: pixel[3],
         };
       };
 
@@ -83,12 +85,12 @@ const Paper = ({
         if (color.r < 50 && color.g < 50 && color.b < 50) {
           return color;
         }
-        
+
         return {
           r: Math.max(0, Math.floor(color.r * 0.8)),
           g: Math.max(0, Math.floor(color.g * 0.8)),
           b: Math.max(0, Math.floor(color.b * 0.8)),
-          a: color.a
+          a: color.a,
         };
       };
 
@@ -98,7 +100,7 @@ const Paper = ({
         canvas.width,
         canvas.height
       );
-  
+
       const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
         let clientX, clientY;
@@ -114,24 +116,24 @@ const Paper = ({
           y: clientY - rect.top,
         };
       };
-  
+
       const startDrawing = (e) => {
         if (e.touches) e.preventDefault();
         if (stepRef.current !== 5) return;
         const { x, y } = getPos(e);
         isDrawing.current = true;
         lastPoint.current = { x, y };
-        
+
         const color = getPixelColor(x, y);
         const darkenedColor = darkenColor(color);
         ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.8)`;
-        
+
         ctx.beginPath();
         ctx.moveTo(x, y);
         setHideContainer(true);
         setHasDrawn(true);
       };
-  
+
       const draw = (e) => {
         if (e.touches) e.preventDefault();
         if (!isDrawing.current || stepRef.current !== 5) return;
@@ -152,7 +154,7 @@ const Paper = ({
               r: Math.max(0, Math.floor(color.r * 0.92)),
               g: Math.max(0, Math.floor(color.g * 0.92)),
               b: Math.min(255, Math.floor(color.b * 0.97) + 4),
-              a: color.a
+              a: color.a,
             };
             ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.09)`;
             ctx.beginPath();
@@ -169,12 +171,12 @@ const Paper = ({
           lastPoint.current = { x, y };
         });
       };
-  
+
       const stopDrawing = (e) => {
         if (e && e.touches) e.preventDefault();
         if (isDrawing.current && stepRef.current === 5) {
           ctx.closePath();
-  
+
           initialCanvasSnapshot.current = ctx.getImageData(
             0,
             0,
@@ -182,11 +184,11 @@ const Paper = ({
             canvas.height
           );
         }
-  
+
         isDrawing.current = false;
         setHideContainer(false);
       };
-  
+
       canvas.addEventListener("pointerdown", startDrawing);
       canvas.addEventListener("pointermove", draw);
       canvas.addEventListener("pointerup", stopDrawing);
@@ -196,21 +198,24 @@ const Paper = ({
       canvas.addEventListener("touchmove", draw, { passive: false });
       canvas.addEventListener("touchend", stopDrawing, { passive: false });
       canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
-  
+
       return () => {
         canvas.removeEventListener("pointerdown", startDrawing);
         canvas.removeEventListener("pointermove", draw);
         canvas.removeEventListener("pointerup", stopDrawing);
         canvas.removeEventListener("pointerleave", stopDrawing);
         canvas.removeEventListener("pointercancel", stopDrawing);
-        canvas.removeEventListener("touchstart", startDrawing, { passive: false });
+        canvas.removeEventListener("touchstart", startDrawing, {
+          passive: false,
+        });
         canvas.removeEventListener("touchmove", draw, { passive: false });
         canvas.removeEventListener("touchend", stopDrawing, { passive: false });
-        canvas.removeEventListener("touchcancel", stopDrawing, { passive: false });
+        canvas.removeEventListener("touchcancel", stopDrawing, {
+          passive: false,
+        });
       };
     };
   }, []);
-  
 
   useEffect(() => {
     if (step !== 6 || !initialCanvasSnapshot.current) return;
@@ -340,7 +345,7 @@ const Paper = ({
           setActiveSlide={setActiveSlide}
         />
       )}
-      <motion.div
+      {/* <motion.div
         initial={{ y: "0%" }}
         animate={{ y: hideContainer ? "-100%" : "0%" }}
         exit={{ opacity: 0 }}
@@ -366,7 +371,7 @@ const Paper = ({
             Back
           </motion.button>
         )}
-        {/* {step === 7 && (
+        {step === 7 && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -377,8 +382,8 @@ const Paper = ({
             <img src={zoom} alt="zoom" className="w-8 h-8" />
             Zoom-in
           </motion.button>
-        )} */}
-      </motion.div>
+        )}
+      </motion.div> */}
       {step === 7 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -398,6 +403,45 @@ const Paper = ({
           Download item image
         </motion.div>
       )}
+      <AnimatePresence>
+        {!hasDrawn && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] aspect-square   rounded-full   flex l justify-center items-center pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at center, #B4B4B410 0%, #B4B4B430 100%), radial-gradient(circle at center, transparent 0%, #ffffff20 44%, #ffffff66 100%)",
+              backdropFilter: "blur(20px)",
+              boxShadow: "0px 4px 30px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <div className="w-full h-full flex justify-center items-center relative">
+              <img
+                src={ellipse}
+                alt="elipse"
+                className="w-1/2 h-1/2 absolute top-3 left-3 "
+              />
+              <motion.img
+                src={hand}
+                alt="hand"
+                className="w-1/2 h-1/2"
+                // rotate 90 degrees and back in loop
+                animate={{
+                  rotate: -40,
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

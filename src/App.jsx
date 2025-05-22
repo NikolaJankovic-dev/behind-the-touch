@@ -77,7 +77,7 @@ function App() {
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
               {/* <PaperGSLS step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} /> */}
-              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} />
+              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} hasDrawn={hasDrawn} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -101,9 +101,9 @@ function App() {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
+                  className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start Now <img src={forward} alt="forward" className="w-8 h-8" />
+                  Start Now <img src={forward} alt="forward" className="w-6 h-6" />
                 </motion.button>
               )}
 
@@ -163,9 +163,9 @@ function App() {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
+                  className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                 >
-                  Next <img src={forward} alt="forward" className="w-8 h-8" />
+                  Next <img src={forward} alt="forward" className="w-6 h-6" />
                 </motion.button>
               )}
               {step === 4 && (
@@ -176,9 +176,9 @@ function App() {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -500, opacity: 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-white text-4xl  cursor-pointer flex items-center gap-4"
+                  className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start now <img src={forward} alt="forward" className="w-8 h-8" />
+                  Start now <img src={forward} alt="forward" className="w-6 h-6" />
                 </motion.button>
               )}
                 {(step === 5 || step === 6) && (
@@ -188,10 +188,10 @@ function App() {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -500, opacity: 0 }}
                     onClick={() => setStep((prev) => prev + 1)}
-                    className={`text-white text-4xl   flex items-center gap-4 ${!hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"}`}
+                    className={`text-white text-2xl   flex items-center gap-4 ${!hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"}`}
                     disabled={!hasDrawn}
                   >
-                    Finish <img src={forward} alt="forward" className="w-8 h-8" />
+                    Finish <img src={forward} alt="forward" className="w-6 h-6" />
                   </motion.button>
                 )}
                 {step === 7 && (
@@ -201,9 +201,9 @@ function App() {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -500, opacity: 0 }}
                     onClick={() => {setStep(0); setHasDrawn(false);}}
-                    className="text-white text-4xl  cursor-pointer flex items-center gap-4"
+                    className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                   >
-                    Restart <img src={restart} alt="restart" className="w-8 h-8" />
+                    Restart <img src={restart} alt="restart" className="w-6 h-6" />
                   </motion.button>
                 )}
             </AnimatePresence>
