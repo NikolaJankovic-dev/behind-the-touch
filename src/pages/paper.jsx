@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { MessageCarousel } from "../components/game/message-carousel";
 import { AnimatePresence, motion } from "motion/react";
 import back from "@/assets/images/icons/back.png";
-import zoom from "@/assets/images/icons/zoom.png";
 import download from "@/assets/images/icons/download.png";
 import hand from "@/assets/images/hand.png";
 import ellipse from "@/assets/images/ellipse.png";
@@ -11,9 +10,11 @@ const Paper = ({
   setHideContainer,
   step,
   setStep,
-  setHasDrawn,
   hideContainer,
+  setHasDrawn,
   hasDrawn,
+  undoSignal,
+  setUndoDisabled,
 }) => {
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
@@ -22,6 +23,12 @@ const Paper = ({
   const stepRef = useRef(step);
   const initialCanvasSnapshot = useRef(null);
   const messageImageRef = useRef(null);
+  const [showHand, setShowHand] = useState(true);
+  const ctxRef = useRef(null);
+  const undoStack = useRef([]);
+  const [undoStackSize, setUndoStackSize] = useState(0);
+
+
   let snapshot = null;
   let offscreenCanvas = null;
   let offscreenCtx = null;
@@ -29,6 +36,14 @@ const Paper = ({
   useEffect(() => {
     stepRef.current = step;
   }, [step]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowHand(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // 🔁 Nacrtaj pozadinu direktno u canvas
 
@@ -43,8 +58,8 @@ const Paper = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!canvas || !ctx) return;
+    ctxRef.current = canvas.getContext("2d");
+    if (!canvas || !ctxRef.current) return;
 
     const container = canvas.parentElement;
     const displayWidth = container.clientWidth;
@@ -55,13 +70,16 @@ const Paper = ({
     canvas.style.height = `${displayHeight}px`;
     canvas.width = displayWidth * dpr;
     canvas.height = displayHeight * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr);
+    ctxRef.current.setTransform(1, 0, 0, 1, 0, 0);
+    ctxRef.current.scale(dpr, dpr);
 
     const img = new Image();
     img.src = "/canvasbg.png";
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+      ctxRef.current.drawImage(img, 0, 0, displayWidth, displayHeight);
+      undoStack.current.push(
+        ctxRef.current.getImageData(0, 0, canvas.width, canvas.height)
+      );
       // Inicijalizuj offscreen canvas
       offscreenCanvas = document.createElement("canvas");
       offscreenCanvas.width = canvas.width;
@@ -94,7 +112,7 @@ const Paper = ({
         };
       };
 
-      initialCanvasSnapshot.current = ctx.getImageData(
+      initialCanvasSnapshot.current = ctxRef.current.getImageData(
         0,
         0,
         canvas.width,
@@ -126,10 +144,10 @@ const Paper = ({
 
         const color = getPixelColor(x, y);
         const darkenedColor = darkenColor(color);
-        ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.8)`;
+        ctxRef.current.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.8)`;
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+        ctxRef.current.beginPath();
+        ctxRef.current.moveTo(x, y);
         setHideContainer(true);
         setHasDrawn(true);
       };
@@ -156,18 +174,23 @@ const Paper = ({
               b: Math.min(255, Math.floor(color.b * 0.97) + 4),
               a: color.a,
             };
-            ctx.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.09)`;
-            ctx.beginPath();
-            ctx.arc(ix, iy, 36, 0, Math.PI * 2);
-            ctx.fill();
+            ctxRef.current.fillStyle = `rgba(${darkenedColor.r}, ${darkenedColor.g}, ${darkenedColor.b}, 0.09)`;
+            ctxRef.current.beginPath();
+            ctxRef.current.arc(ix, iy, 96, 0, Math.PI * 2);
+            ctxRef.current.fill();
             // Crtaj i na offscreen canvas
-            offscreenCtx.fillStyle = ctx.fillStyle;
+            offscreenCtx.fillStyle = ctxRef.current.fillStyle;
             offscreenCtx.beginPath();
-            offscreenCtx.arc(ix, iy, 36, 0, Math.PI * 2);
+            offscreenCtx.arc(ix, iy, 96, 0, Math.PI * 2);
             offscreenCtx.fill();
           }
           // update snapshot posle svakog poteza
-          snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          snapshot = ctxRef.current.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
           lastPoint.current = { x, y };
         });
       };
@@ -175,9 +198,18 @@ const Paper = ({
       const stopDrawing = (e) => {
         if (e && e.touches) e.preventDefault();
         if (isDrawing.current && stepRef.current === 5) {
-          ctx.closePath();
+          ctxRef.current.closePath();
 
-          initialCanvasSnapshot.current = ctx.getImageData(
+          // Snimi poslednji potez za undo
+          if (undoStack.current.length >= 20) {
+            undoStack.current.shift(); // limit
+          }
+          undoStack.current.push(
+            ctxRef.current.getImageData(0, 0, canvas.width, canvas.height)
+          );
+          setUndoDisabled(false);
+          setUndoStackSize(undoStack.current.length);
+          initialCanvasSnapshot.current = ctxRef.current.getImageData(
             0,
             0,
             canvas.width,
@@ -216,6 +248,24 @@ const Paper = ({
       };
     };
   }, []);
+
+  const handleUndo = () => {
+    if (undoStack.current.length > 1) {
+      undoStack.current.pop();
+      const prevImage = undoStack.current[undoStack.current.length - 1];
+      ctxRef.current.putImageData(prevImage, 0, 0);
+      initialCanvasSnapshot.current = prevImage;
+      setUndoStackSize(undoStack.current.length);
+    } 
+  };
+
+  useEffect(() => {
+    console.log("undoStack length", undoStackSize);
+    if (undoStackSize === 1) {
+      setUndoDisabled(true);
+      setHasDrawn(false);
+    }
+  }, [undoStackSize]);
 
   useEffect(() => {
     if (step !== 6 || !initialCanvasSnapshot.current) return;
@@ -327,6 +377,10 @@ const Paper = ({
     }
   }, [step]);
 
+  useEffect(() => {
+    handleUndo();
+  }, [undoSignal]);
+
   return (
     <div style={{ position: "relative", height: window.innerHeight }}>
       <canvas
@@ -345,45 +399,6 @@ const Paper = ({
           setActiveSlide={setActiveSlide}
         />
       )}
-      {/* <motion.div
-        initial={{ y: "0%" }}
-        animate={{ y: hideContainer ? "-100%" : "0%" }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
-        className="absolute top-0 left-0 right-0 p-4  rounded-b-3xl  h-30 flex justify-start items-end"
-        style={{
-          background: "radial-gradient(circle, #b4b4b410, #b4b4b430)",
-          backdropFilter: "blur(20px)",
-          boxShadow: "0px 4px 30px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        {" "}
-        {step < 8 && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            onClick={() => setStep((prev) => prev - 1)}
-            className="flex items-center gap-2 font-bold  text-xl cursor-pointer"
-          >
-            <img src={back} alt="back" className="w-8 h-8" />
-            Back
-          </motion.button>
-        )}
-        {step === 7 && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="flex items-center gap-2 font-bold  text-xl text-white cursor-pointer"
-          >
-            <img src={zoom} alt="zoom" className="w-8 h-8" />
-            Zoom-in
-          </motion.button>
-        )}
-      </motion.div> */}
       {step === 7 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -404,13 +419,13 @@ const Paper = ({
         </motion.div>
       )}
       <AnimatePresence>
-        {!hasDrawn && (
+        {!hasDrawn && showHand && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] aspect-square   rounded-full   flex l justify-center items-center pointer-events-none"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 aspect-square   rounded-full   flex l justify-center items-center pointer-events-none"
             style={{
               background:
                 "radial-gradient(circle at center, #B4B4B410 0%, #B4B4B430 100%), radial-gradient(circle at center, transparent 0%, #ffffff20 44%, #ffffff66 100%)",

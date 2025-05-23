@@ -28,8 +28,8 @@ const Landing = ({ step }) => {
             className=" text-4xl hackney-vector "
             style={{
               background: "#ffffff",
-              webkitBackgroundClip: "text",
-              webkitTextFillColor: "transparent",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
             BEHIND
@@ -46,8 +46,8 @@ const Landing = ({ step }) => {
           className=" text-8xl hackney-vector  "
           style={{
             background: "#ffffff",
-            webkitBackgroundClip: "text",
-            webkitTextFillColor: "transparent",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
           THE TOUCH

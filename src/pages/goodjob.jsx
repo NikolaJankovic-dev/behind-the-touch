@@ -16,15 +16,15 @@ const GoodJob = ({ step }) => {
       <img
         src={gjpack}
         alt="gjpack"
-        className="absolute top-20 left-[50%] translate-x-[-50%] h-[40vh] w-auto object-cover object-center"
+        className="absolute top-20 left-[50%] translate-x-[-50%] h-[36vh] w-auto object-cover object-center"
       />
       <div className="absolute bottom-32 left-0 right-0 p-4 gap-2 flex flex-col justify-center items-center">
         <p
           className=" text-8xl hackney-vector text-center"
           style={{
             background: "#ffffff",
-            webkitBackgroundClip: "text",
-            webkitTextFillColor: "transparent",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
           Good Job!

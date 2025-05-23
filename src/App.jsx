@@ -15,6 +15,8 @@ function App() {
   const [hideContainer, setHideContainer] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
   const [showNext, setShowNext] = useState(false);
+  const [undoSignal, setUndoSignal] = useState(false);
+  const [undoDisabled, setUndoDisabled] = useState(true);
   return (
     <div
       className="  flex items-center justify-center bg-gray-700 overflow-hidden relative"
@@ -77,7 +79,16 @@ function App() {
               style={{ position: "absolute", width: "100%", height: "100%" }}
             >
               {/* <PaperGSLS step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} /> */}
-              <Paper step={step} hideContainer={hideContainer} setHideContainer={setHideContainer} setStep={setStep} setHasDrawn={setHasDrawn} hasDrawn={hasDrawn} />
+              <Paper
+                step={step}
+                hideContainer={hideContainer}
+                setHideContainer={setHideContainer}
+                setStep={setStep}
+                setHasDrawn={setHasDrawn}
+                hasDrawn={hasDrawn}
+                undoSignal={undoSignal}
+                setUndoDisabled={setUndoDisabled}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -103,7 +114,8 @@ function App() {
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                   className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start Now <img src={forward} alt="forward" className="w-6 h-6" />
+                  Start Now{" "}
+                  <img src={forward} alt="forward" className="w-6 h-6" />
                 </motion.button>
               )}
 
@@ -145,9 +157,13 @@ function App() {
                       onClick={() => {
                         if (step === 2) {
                           setStep(3);
-                        } 
+                        }
                       }}
-                      className={`text-white text-xl  cursor-pointer hover:no-underline ${step === 2 ? "hover:cursor-pointer" : "hover:cursor-default"}`}
+                      className={`text-white text-xl  cursor-pointer hover:no-underline ${
+                        step === 2
+                          ? "hover:cursor-pointer"
+                          : "hover:cursor-default"
+                      }`}
                       variant="link"
                     >
                       Next
@@ -178,34 +194,78 @@ function App() {
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                   className="text-white text-2xl  cursor-pointer flex items-center gap-4"
                 >
-                  Start now <img src={forward} alt="forward" className="w-6 h-6" />
+                  Start now{" "}
+                  <img src={forward} alt="forward" className="w-6 h-6" />
                 </motion.button>
               )}
-                {(step === 5 || step === 6) && (
-                  <motion.button
-                    key="finish-button"
-                    initial={{ x: 500, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -500, opacity: 0 }}
+              {step === 5 && (
+                <motion.div
+                  className="flex  justify-between items-center gap-2 w-full"
+                  key="step-5"
+                  initial={{ x: 500, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -500, opacity: 0 }}
+                >
+                  <button
+                    className={`text-white text-2xl flex items-center gap-4 ${
+                      undoDisabled
+                        ? "!opacity-20"
+                        : "!opacity-100 cursor-pointer"
+                    }
+                    `}
+                    onClick={() => setUndoSignal(!undoSignal)}
+                    disabled={undoDisabled}
+                  >
+                    <img
+                      src={forward}
+                      alt="undo"
+                      className="w-6 h-6 rotate-180"
+                    />
+                    Undo
+                  </button>
+                  <button
                     onClick={() => setStep((prev) => prev + 1)}
-                    className={`text-white text-2xl   flex items-center gap-4 ${!hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"}`}
+                    className={`text-white text-2xl flex items-center gap-4 ${
+                      !hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"
+                    }`}
                     disabled={!hasDrawn}
                   >
-                    Finish <img src={forward} alt="forward" className="w-6 h-6" />
-                  </motion.button>
-                )}
-                {step === 7 && (
-                  <motion.button
-                    key="restart-button"
-                    initial={{ x: 500, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -500, opacity: 0 }}
-                    onClick={() => {setStep(0); setHasDrawn(false);}}
-                    className="text-white text-2xl  cursor-pointer flex items-center gap-4"
-                  >
-                    Restart <img src={restart} alt="restart" className="w-6 h-6" />
-                  </motion.button>
-                )}
+                    Next <img src={forward} alt="forward" className="w-6 h-6" />
+                  </button>
+                </motion.div>
+              )}
+              {step === 6 && (
+                <motion.button
+                  key="finish-button"
+                  initial={{ x: 500, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -500, opacity: 0 }}
+                  onClick={() => setStep((prev) => prev + 1)}
+                  className={`text-white text-2xl   flex items-center gap-4 ${
+                    !hasDrawn ? "!opacity-20" : "!opacity-100 cursor-pointer"
+                  }`}
+                  disabled={!hasDrawn}
+                >
+                  Finish <img src={forward} alt="forward" className="w-6 h-6" />
+                </motion.button>
+              )}
+              {step === 7 && (
+                <motion.button
+                  key="restart-button"
+                  initial={{ x: 500, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -500, opacity: 0 }}
+                  onClick={() => {
+                    setStep(0);
+                    setHasDrawn(false);
+                    setUndoDisabled(true);
+                  }}
+                  className="text-white text-2xl  cursor-pointer flex items-center gap-4"
+                >
+                  Restart{" "}
+                  <img src={restart} alt="restart" className="w-6 h-6" />
+                </motion.button>
+              )}
             </AnimatePresence>
           </div>
         </motion.div>
